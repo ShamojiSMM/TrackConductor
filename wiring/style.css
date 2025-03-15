@@ -1,0 +1,130 @@
+@charset "UTF-8";
+
+.labelInput:has(#selectLanding) {
+  display: block;
+}
+
+#selectBaseKey option:nth-child(4) {
+  color: #ff8045;
+}
+
+#selectBaseKey option:nth-child(16) {
+  color: #1eb700;
+}
+
+#selectBaseKey option:nth-child(28) {
+  color: #5d78ff;
+}
+
+.divScroll {
+  overflow-x: scroll;
+  position: relative;
+  margin-top: 0.4rem;
+  margin-bottom: 1.2rem;
+  width: calc(100vw - 54px);
+}
+
+table {
+  overflow-x: hidden;
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+th, td {
+  border: 1px solid #8c8c8c;
+  padding-top: 0.1em;
+  padding-bottom: 0.1em;
+  width: 4em;
+}
+
+th:first-of-type {
+  background-color: #ebebeb;
+  width: 7.4em;
+}
+
+td {
+  padding-left: 0.2em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+td:hover, td:focus {
+  text-overflow: clip;
+}
+
+th label {
+  align-content: center;
+}
+
+tr:first-of-type th:not(:first-of-type):not(.playing):not(.movedInd) {
+  background-color: #ffffe0;
+}
+
+#table0 tr:nth-of-type(n+3):nth-of-type(-n+5) td,
+#table1 tr:nth-of-type(n+3):nth-of-type(-n+6) td {
+  background-color: #fefef7;
+}
+
+#table2 tr:nth-of-type(3) td {
+  background-color: #f0ffff;
+}
+
+#table2 tr:nth-of-type(4) td {
+  background-color: #fff2e9;
+}
+
+th.playing {
+  background-color: #98fb98;
+}
+
+th.movedInd {
+  background-color: #ffedc4;
+}
+
+td.wiringDisplay {
+  background-color: #98fb98;
+}
+
+#divOverview {
+  position: relative;
+}
+
+#divOverview canvas {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+#canvasOverviewSelect {
+  opacity: 0.4;
+}
+
+#canvasWiring {
+  width: 32px;
+  height: 320px;
+  outline: 2px solid #8f8f8f;
+  border-radius: 6px;
+  margin-right: 22px;
+}
+
+#divWiring {
+  display: inline-block;
+  vertical-align: top;
+}
+
+.pResult:has(.spanWiringResults) {
+  margin-bottom: 2em;
+}
+
+.spanWiringResults span {
+  cursor: pointer;
+  transition: 0.15s;
+  display: inline-block;
+  margin-right: 0.5em;
+}
+
+.spanWiringResults span:hover {
+  color: #5e5e5e;
+}

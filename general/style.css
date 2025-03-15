@@ -1,0 +1,162 @@
+@charset "UTF-8";
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+*::selection {
+  background-color: rgba(170, 200, 255, 0.6);
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  white-space: nowrap;
+  font-family: Arial, sans-serif;
+}
+
+main {
+  min-width: 100vw;
+  width: fit-content;
+}
+
+h1 {
+  margin-bottom: 20px;
+  padding-left: 1em;
+  background-color: rgba(255, 246, 220, 0.7);
+  font-size: 2.6rem;
+  text-shadow: 0.2em 0.14em 0.06em rgba(0, 0, 0, 0.15);
+  position: relative;
+  display: flex;
+}
+
+h1 img {
+  height: 3.2rem;
+  position: absolute;
+  top: 50%;
+  left: calc(min(100vw, 100%) - 5.6rem);
+  border-radius: 50%;
+  outline: 4px solid rgba(255, 246, 220, 0.7);
+  transition: 0.2s;
+}
+
+h1 img:hover {
+  transform: scale(1.15);
+}
+
+h2 {
+  margin: 10px 0.4em 28px 0;
+  font-size: 2rem;
+  text-shadow: 0.1em 0.1em 0.08em rgba(0, 0, 0, 0.1);
+  display: inline-block;
+}
+
+header {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  width: 100%;
+}
+
+header div {
+  margin-left: 2.6rem;
+}
+
+.pText {
+  font-size: 1.3rem;
+}
+
+.pDescription {
+  font-size: 0.96rem;
+  display: inline-block;
+}
+
+p.gray {
+  color: gray;
+}
+
+section {
+  margin-left: 22px;
+  padding-bottom: 20px;
+  padding-right: 22px;
+}
+
+.pSubH {
+  display: inline-block;
+  font-size: 1.1rem;
+}
+
+.labelInput {
+  font-size: 1.1rem;
+  font-weight: bold;
+  display: inline-block;
+  height: 2.4rem;
+}
+
+.labelInput.spaceRight {
+  margin-right: 1rem;
+}
+
+.labelInput.spaceBottom {
+  margin-bottom: 1.2rem;
+}
+
+input[type="number"] {
+  height: 2rem;
+  width: 4rem;
+  padding-left: 0.4em;
+}
+
+input[type="text"] {
+  height: 2rem;
+  width: 10rem;
+  padding-left: 0.4em;
+}
+
+input[type="checkbox"] {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-right: 0.5rem;
+}
+
+.labelInput:has(input[type="checkbox"]) {
+  font-size: 0.96rem;
+  font-weight: normal;
+  display: flex;
+  align-items: center;
+}
+
+select {
+  height: 2rem;
+  padding-left: 0.3em;
+  padding-right: 0.2rem;
+}
+
+button {
+  height: 2rem;
+  padding-left: 0.6em;
+  padding-right: 0.6em;
+}
+
+.pResult {
+  font-size: 1.1rem;
+  font-weight: bold;
+  display: inline-block;
+}
+
+.pResult span {
+  font-weight: normal;
+}
+
+.uneditable {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.invisible {
+  display: none;
+}
