@@ -91,7 +91,7 @@ async function changeLanguage() {
 
       getElmAll(`[data-l="${parts[0]}"]`).forEach(elm => {
         elm.textContent = parts[1];
-        if (parts[2] != "") elm.title = parts[2];
+        if (!["", undefined].includes(parts[2])) elm.title = parts[2];
       });
     }
   });
