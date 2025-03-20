@@ -338,9 +338,17 @@ const dataAssets = {
   }
 };
 
-const landingNames = {
-  general: "通常",
-  second: "2マス目",
-  vertical: "垂直",
-  diagonal: "斜め"
+const landingNamesList = {
+  ja: {
+    general: "通常",
+    second: "2マス目",
+    vertical: "垂直",
+    diagonal: "斜め"
+  },
+  en: {
+    general: "General",
+    second: "2nd",
+    vertical: "Vertical",
+    diagonal: "Diagonal"
+  }
 };
