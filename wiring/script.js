@@ -20,16 +20,26 @@ const selectTrack = getElm("#selectTrack");
 for (let i = 1; i <= 16; i ++) addOption(selectTrack, i);
 selectTrack.selectedIndex = 2;
 
-const keyNames = ["ド", "ド#", "レ", "レ#", "ミ", "ファ", "ファ#", "ソ", "ソ#", "ラ", "ラ#", "シ"];
-
 const selectBaseKey = getElm("#selectBaseKey");
 
-for (let i = 27; i >= 0; i --) {
-  const text = `${Math.floor(i / 12) + 1}-${keyNames[i % 12]}`;
-  addOption(selectBaseKey, text);
+function setSelectBaseKey() {
+  const keyNamesList = {
+    ja: ["ド", "ド#", "レ", "レ#", "ミ", "ファ", "ファ#", "ソ", "ソ#", "ラ", "ラ#", "シ"],
+    en: ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+  };
+
+  const keyNames = keyNamesList[selectLanguage.value] || keyNamesList.en;
+  selectBaseKey.options.length = 0;
+
+  for (let i = 27; i >= 0; i --) {
+    const text = `${Math.floor(i / 12) + 1}-${keyNames[i % 12]}`;
+    addOption(selectBaseKey, text);
+  }
+
+  selectBaseKey.selectedIndex = 15;
 }
 
-selectBaseKey.selectedIndex = 15;
+setSelectBaseKey();
 
 const inputTickUnit = getElm("#inputTickUnit");
 const selectNoteInput = getElm("#selectNoteInput");
@@ -50,11 +60,20 @@ function changeNoteInput(isClearRows = true)  {
   selectNoteInput.parentNode.parentNode.title = selectNoteInput.options[index].title;
 }
 
-selectNoteInput.addEventListener("change", () => changeNoteInput);
+selectNoteInput.addEventListener("change", changeNoteInput);
 changeNoteInput(false);
 
-const selectLanding = getElm("#selectLanding");
+selectLanguage.addEventListener("change", () => {
+  setSelectBaseKey();
+  changeWiringType();
 
+  setTimeout(() => {
+    const cell = selectNoteInput.parentNode.parentNode;
+    cell.title = selectNoteInput.options[selectNoteInput.selectedIndex].title;
+  }, 500);
+});
+
+const selectLanding = getElm("#selectLanding");
 let typeKeys;
 
 function changeType(isClearRow = true) {
@@ -150,10 +169,10 @@ tables.forEach((table, t) => {
             ].text;
 
             spanWiringData.textContent = `
-              列: ${c},
-              音階: ${keyName},
-              遅延: ${delay},
-              高さ: ${height}
+              Column: ${c},
+              Key: ${keyName},
+              Delay: ${delay},
+              Height: ${height}
             `;
 
             const context = canvasOverviewSelect.getContext("2d");
@@ -896,6 +915,9 @@ function changeWiringType() {
   if (keys[1] == "water") keys = ["noWing", "ground"];
 
   const landingKeys = Object.keys(dataAssets[keys[0]][keys[1]].accelerationsList);
+  const landingNames = landingNamesList[selectLanguage.value] || landingNamesList.en;
+
+  selectWiringLanding.options.length = 0;
   landingKeys.forEach(key => addOption(selectWiringLanding, landingNames[key], key));
 }
 
@@ -1121,7 +1143,7 @@ function setWiringResult() {
       const span = document.createElement("span");
 
       span.textContent = `${result.str}, `;
-      span.title = `遅延: ${result.delay}, ↑: ${result.up}, ↓: ${result.down}`;
+      span.title = `Delay: ${result.delay}, ↑: ${result.up}, ↓: ${result.down}`;
       span.addEventListener("click", () => drawWiring(result.str));
 
       container.append(span);
