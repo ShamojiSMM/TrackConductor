@@ -1,0 +1,13 @@
+title,トップ | Track Conductor
+head.top,レール演奏補助ツール
+text.h1Desc,現在大工事中です。
+button.wiringGenerator,集音生成
+text.wiringGenerator,"羽なし、水中にも対応しました。"
+button.trackGenerator,レールループ生成
+text.trackGenerator,Coming Soon...?
+button.trackBuilder,レールループ設計
+text.trackBulider,Coming Soon...?
+button.globalSourceList,グローバル音源集
+text.globalSourceList,Coming Soon...?
+button.linkList,用語・リンク集
+text.linkList,Coming Soon...?
