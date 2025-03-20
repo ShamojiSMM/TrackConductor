@@ -15,171 +15,178 @@
   <script src="data.js" defer></script>
   <script src="script.js" defer></script>
 
-  <title>集音生成 | Track Conductor</title>
+  <title data-l="title"></title>
 </head>
 
 <body>
   <main>
     <header>
       <h1>
-        レール演奏補助ツール
+        <a href="../top/index.html" data-l="head.top"></a>
+
         <a href="https://x.com/Shamoji_SMM" target="_blank">
           <img src="../general/images/xIcon.jpg" title="made by @Shamoji_SMM">
         </a>
       </h1>
 
-      <div>
-        <p class="pText">現在改装中です。</p>
-        <p class="pDescription gray">Last Update: 2025/Mar/15</p>
+      <div class="spaceBottom">
+        <p class="pText" data-l="text.h1Desc"></p>
+        <p class="pDescription gray">Last Update: 2025/Mar/20</p>
       </div>
+
+      <label class="labelInput">
+        Language:
+        <select id="selectLanguage"></select>
+      </label>
     </header>
 
     <hr>
     <section>
-      <h2>集音生成</h2>
-      <p class="pSubH">羽あり地上/水中、羽なし地上の縦断線式集音。</p><br>
+      <h2 data-l="head.collectingGenerator"></h2>
+      <p class="pSubH" data-l="text.collectingGeneratorDesc"></p><br>
 
       <label class="labelInput">
-        集音タイプ:
+        <span data-l="label.selectType"></span>
+
         <select id="selectType">
-          <option value="wing-ground" selected>羽あり, 地上</option>
-          <option value="noWing-ground">羽なし, 地上</option>
-          <option value="wing-water">羽あり, 水中</option>
-          <option value="noWing-water">羽なし, 水中</option>
+          <option value="wing-ground" data-l="option.wing-ground" selected></option>
+          <option value="noWing-ground" data-l="option.noWing-ground"></option>
+          <option value="wing-water" data-l="option.wing-water"></option>
+          <option value="noWing-water" data-l="option.noWing-water"></option>
         </select>
       </label><br>
 
       <label class="labelInput">
-        MIDIファイル:
+        <span data-l="label.inputSmf"></span>
         <input id="inputSmf" type="file" accept=".midi, .mid, .smf">
       </label>
 
       <label class="labelInput">
-        トラック:
+        <span data-l="label.selectTrack"></span>
         <select id="selectTrack"></select>
       </label><br>
 
       <label class="labelInput spaceBottom">
-        <button id="buttonLoadSmf">読み込み</button>
+        <button id="buttonLoadSmf" data-l="buttonLoadSmf"></button>
       </label><br>
 
       <label class="labelInput">
-        4分音価:
+        <span data-l="label.inputTickUnit"></span>
         <input id="inputTickUnit" type="number" value="480" step="1" min="1">
       </label><br>
 
       <label class="labelInput spaceRight">
-        4分符長[f]:
+        <span data-l="label.inputBeatValue"></span>
         <input id="inputBeatValue" type="number" step="any">
       </label>
 
       <p class="pResult">
-        BPM:
+        <span data-l="label.spanBpm"></span>
         <span id="spanBpm"></span>
       </p><br>
 
       <label class="labelInput">
-        基準音:
+        <span data-l="label.selectBaseKey"></span>
         <select id="selectBaseKey"></select>
       </label>
 
       <label class="labelInput spaceRight">
-        <button id="buttonPlay">演奏</button>
+        <button id="buttonPlay" data-l="button.play"></button>
       </label>
 
       <label class="labelInput">
-        音色:
+        <span data-l="label.selectInstrument"></span>
         <select id="selectInstrument">
-          <option>正弦波</option>
-          <option>三角波</option>
-          <option selected>矩形波</option>
-          <option>ノコギリ波</option>
+          <option data-l="option.sine"></option>
+          <option data-l="option.triangle"></option>
+          <option data-l="option.square" selected></option>
+          <option data-l="option.sawtooth"></option>
         </select>
       </label>
 
       <label class="labelInput">
-        <button id="buttonStopPlay">演奏停止</button>
+        <button id="buttonStopPlay" data-l="button.stopPlay"></button>
       </label>
 
       <div class="divScroll">
         <table id="table0">
-          <tr><th>番号</th></tr>
-          <tr><th>メモ</th></tr>
-          <tr><th title="">
+          <tr><th data-l="cell.index"></th></tr>
+          <tr><th data-l="cell.memo"></th></tr>
+          <tr><th>
             <label class="labelInput">
               <select id="selectNoteInput">
-                <option selected title="音の長さ。4分符2つ分の長さなら、(4分音価) * 2 となる。">音価</option>
-                <option title="(2)=2分音符, (8.)=付点8分音符, (4..+8-16)=複付点4分音符+8分音符-16分音符=2分音符">n分符</option>
+                <option data-l="option.tickUnit" selected></option>
+                <option data-l="option.nthNote"></option>
               </select>
             </label>
           </th></tr>
-          <tr><th title="音の長さ。">符長[f]</th></tr>
-          <tr><th title="基準音からの音程の差(半音単位)。">音高[b]</th></tr>
+          <tr><th data-l="cell.noteValue"></th></tr>
+          <tr><th data-l="cell.notePitch"></th></tr>
         </table>
       </div>
 
       <label class="labelInput">
-        <button id="buttonCalcTable0">ここまで計算</button>
+        <button id="buttonCalcTable0" data-l="button.calcTable0"></button>
       </label><br>
 
       <label class="labelInput">
-        読み込みタイプ:
+        <span data-l="label.selectLoading"></span>
         <select id="selectLoading">
-          <option selected>開始画面(全て同時)</option>
-          <option>自由落下</option>
-          <option>縦スクロール</option>
-          <option>横スクロール</option>
+          <option data-l="option.instantLoad" selected></option>
+          <option data-l="option.freeFall"></option>
+          <option data-l="option.verticalScroll"></option>
+          <option data-l="option.horizontalScroll"></option>
         </select>
       </label>
 
       <label class="labelInput invisible">
         <select id="selectLoadingInput">
-          <option>カスタム</option>
-          <option selected>平均遅度</option>
-          <option>遅度循環</option>
+          <option data-l="option.custom"></option>
+          <option data-l="option.slownessAve" selected></option>
+          <option data-l="option.slownessCycle"></option>
         </select>
       </label><br>
 
       <label class="labelInput invisible">
-        平均スクロール遅度[f/b]:
+        <span data-l="label.inputScrollSlownessAve"></span>
         <input id="inputScrollSlownessAve" type="number" step="any">
       </label>
 
       <label class="labelInput invisible">
-        スクロール遅度循環[f/b]:
+        <span data-l="label.inputScrollSlownessCycle"></span>
         <input id="inputScrollSlownessCycle" type="text" placeholder="e.g. 6, 7, 6, 6, 7">
       </label>
 
       <label class="labelInput">
-        着線パターン:
+        <span data-l="label.selectLanding"></span>
         <select id="selectLanding">
-          <option>カスタム</option>
+          <option data-l="option.custom"></option>
         </select>
       </label>
 
       <div class="divScroll">
         <table id="table1">
-          <tr><th>番号</th></tr>
-          <tr><th>メモ</th></tr>
-          <tr><th title="基準音が鳴ってからその音が鳴るまでの時間。">時刻[f]</th></tr>
-          <tr><th title="前列と比べたときの、音符ブロックが移動する分の遅延。">列間遅延[f]</th></tr>
-          <tr class="invisible"><th title="前列と比べたときの、スクロールでの遅延。">横ス遅延[f]</th></tr>
-          <tr><th title="基準列の音符ブロックとの高さの差。">y差[b]</th></tr>
+          <tr><th data-l="cell.index"></th></tr>
+          <tr><th data-l="cell.memo"></th></tr>
+          <tr><th data-l="cell.time"></th></tr>
+          <tr><th data-l="cell.interColumnDelay"></th></tr>
+          <tr class="invisible"><th data-l="cell.scrollDelay"></th></tr>
+          <tr><th data-l="cell.yDifference"></th></tr>
         </table>
       </div>
 
       <label class="labelInput spaceRight">
-        基準遅延[f]:
+        <span data-l="label.inputBaseDelay"></span>
         <input id="inputBaseDelay" type="number" step="1">
       </label>
 
       <label class="labelInput">
-        基準高さ[b]:
+        <span data-l="label.inputBaseHeight"></span>
         <input id="inputBaseHeight" type="number" step="1" min="0">
       </label><br>
 
       <label class="labelInput spaceRight">
-        <button id="buttonSortWirings">集音する</button>
+        <button id="buttonSortWirings" data-l="buttonSortWirings"></button>
       </label>
 
       <p class="pResult">
@@ -188,17 +195,17 @@
 
       <div class="divScroll">
         <table id="table2">
-          <tr><th>番号</th></tr>
-          <tr><th>メモ</th></tr>
-          <tr><th title="その列に与える遅延。">遅延[f]</th></tr>
-          <tr><th title="集音レールとの距離。">高さ[b]</th></tr>
-          <tr><th title="◎: ±0, ○: ±1, △: ±2, ×: それ超過。">配置可</th></tr>
-          <tr><th title="セルを押すと下側に表示。">表示</th></tr>
+          <tr><th data-l="cell.index"></th></tr>
+          <tr><th data-l="cell.memo"></th></tr>
+          <tr><th data-l="cell.delay"></th></tr>
+          <tr><th data-l="cell.height"></th></tr>
+          <tr><th data-l="cell.isWirable"></th></tr>
+          <tr><th data-l="cell.show"></th></tr>
         </table>
       </div>
 
       <label class="labelInput spaceRight">
-        <button id="buttonChangeOverview">全体像を表示/非表示</button>
+        <button id="buttonChangeOverview" data-l="button.changeOverview"></button>
       </label>
 
       <p class="pResult">
@@ -214,62 +221,62 @@
 
     <hr>
     <section>
-      <h2>縦断線式集音配線生成</h2>
-      <p class="pSubH">縦レールによる集音(ぜんまいメソッド)の配置を探します。</p><br>
+      <h2 data-l="head.wiringGenerator"></h2>
+      <p class="pSubH" data-l="text.wiringGeneratorDesc"></p><br>
 
       <canvas id="canvasWiring" width="32"></canvas>
 
       <div id="divWiring">
         <label class="labelInput spaceRight">
-          遅延[f]:
+          <span data-l="label.inputWiringDelay"></span>
           <input id="inputWiringDelay" type="number" step="1">
         </label>
 
         <label class="labelInput">
-          高さ[b]:
+          <span data-l="label.inputWiringHeight"></span>
           <input id="inputWiringHeight" type="number" step="1" min="1">
         </label><br>
 
         <label class="labelInput spaceRight">
-          タイプ:
+          <span data-l="label.selectWiringType"></span>
           <select id="selectWiringType"></select>
         </label>
 
         <label class="labelInput">
-          着線時の形状:
+          <span data-l="label.selectWiringLanding"></span>
           <select id="selectWiringLanding"></select>
         </label><br>
 
         <label class="labelInput spaceRight">
-          <button id="buttonFindWiring">探す</button>
+          <button id="buttonFindWiring" data-l="button.findWiring"></button>
         </label>
 
         <label class="labelInput">
           <select id="selectWiringOrder">
-            <option selected>↑長さ 短い順</option>
-            <option>↑長さ 長い順</option>
-            <option>↓長さ 短い順</option>
-            <option>↓長さ 長い順</option>
+            <option data-l="option.up-asc" selected></option>
+            <option data-l="option.up-des"></option>
+            <option data-l="option.down-asc"></option>
+            <option data-l="option.down-des"></option>
           </select>
         </label>
 
         <label class="labelInput">
           <input id="checkWiringView" type="checkbox" checked>
-          実行時に画像表示
+          <span data-l="label.checkWiringView"></span>
         </label><br>
 
         <p class="pResult">
-          一致:<br>
+          <span data-l="label.wiringResultsMatch"></span><br>
           <span class="spanWiringResults"></span>
         </p><br>
 
         <p class="pResult">
-          誤差:<br>
+          <span data-l="label.wiringResultsNear"></span><br>
           <span class="spanWiringResults"></span>
         </p><br>
 
         <p class="pResult">
-          もっと誤差:<br>
+          <span data-l="label.wiringResultsFar"></span><br>
           <span class="spanWiringResults"></span>
         </p>
       </div>
@@ -277,7 +284,7 @@
 
     <hr>
     <section>
-      <h2>画像</h2><br>
+      <h2 data-l="head.images"></h2><br>
 
       <img src="images/info/gaps.png" alt="gaps" height="180">
       <img src="images/info/height.png" alt="height" height="180"><br>
