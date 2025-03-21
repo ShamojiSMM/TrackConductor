@@ -713,7 +713,7 @@ function sortWirings() {
     });
   }
 
-  const wiringsLen = wirings.length
+  const wiringsLen = wirings.length;
   if (!wiringsLen) {
     if (isOverview) changeOverview(false);
     return;
