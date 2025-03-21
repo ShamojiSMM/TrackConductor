@@ -25,7 +25,7 @@ button.stopPlay,Stop,
 cell.index,Index,
 cell.memo,Memo,
 option.tickUnit,Note Value,"Value of note. If the value is 2 quarter notes, it will be (quarter note value) * 2."
-option.nthNote,Nth Note,"(2) = half note, (8.) = dotted eighth note, (4..+8-16) = double dotted quarter note + eighth note - 16th note = half note."
+option.nthNote,Nth Note,"(2) = Half note, (8.) = Dotted 8th note, (4..+8-16) = Double dotted quarter note + 8th note - 16th note = Half note."
 cell.noteValue,Note Len [f],Length of note.
 cell.notePitch,Pitch [b],Difference in pitch from a base key (in semitones).
 button.calcTable0,Calc this Table,
