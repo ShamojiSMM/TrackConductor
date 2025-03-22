@@ -166,7 +166,7 @@ tables.forEach((table, t) => {
 
             const keyName = selectBaseKey.options[
               selectBaseKey.selectedIndex - height + parseInt(inputBaseHeight.value)
-            ].text;
+            ]?.text;
 
             spanWiringData.textContent = `
               Column: ${c},
