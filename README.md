@@ -19,7 +19,7 @@
 
 ## 1. [集音生成](https://shamojismm.github.io/TrackConductor/wiring/index.html)
 
-主に**集音**(演奏に必要な楽器ブロック群を集めること)を自動化します。
+主に**集音**を自動化します。
 
 MIDIファイルを用意してツールにインポートする方法とメロディをツールに直接入力する方法があります。
 前者を推奨していますが、MIDIファイルを準備できない場合には後者をお使いください。
@@ -195,3 +195,62 @@ MIDIファイルの方法なら最初の音、直接入力なら音高を`0`に�
 
 今回は羽あり水中、自由落下集音で作ってみました。  
 これでめでたく完成です。
+
+# 2. レールループ生成
+# 3. レールループ設計
+# 4. グローバル音源集
+
+---
+
+# 用語集
+
+- **f, フレーム**  
+1/60秒。観測できるSMM2の時間最小単位。
+
+- **b, ブロック**  
+ゲーム内の1マス。
+
+- **f/b, 遅度**  
+単位距離を進むのにかかる時間を遅さといい、それに向きが加わったものが遅度。
+
+- **集音**  
+演奏に必要な楽器ブロック群を集めること。  
+楽器ブロックを集める主に水平なレールを集音レール(配送レール)という。
+
+- **音源**  
+楽器ブロックで鳴らすパーツ。
+
+- **グローバル**  
+プレイヤーがエリアのどこにいても消失しないようなエネミーの状態。  
+それに近いものは準グローバルと言ったりする。
+
+- **グローバルグラウンド(GG)**  
+スネークブロックやレール上のブロックなど、グルーバルでその上に接しているエネミーもグローバルにするような性質を持つパーツ。
+
+- **エンティティリミットA(ELA)**  
+クリボーと配置制限を共有する、つくる画面でのパーツ。
+
+- **エンティティリミットB(ELB)**  
+クリボーと配置制限を共有する、あそぶ画面でのパーツ。
+
+# 参考資料・理論
+
+- **[ぜんまいメソッド(縦断線式集音)](https://www.youtube.com/watch?v=r1Lp6UY5NIc)**
+- **[Global Music Guide](https://docs.google.com/document/d/1UDIb2rA35Rv3DkNeI-p1F2aBea9MUSOXHAmqrl1AlU0/)**
+- **[レールループ周期表(羽あり地上)](https://docs.google.com/document/d/1Q-8_1f7C3F6GWwwpzpdGy1_V7GucipjsmTNJcg_5dwQ/)**
+- **[曲線レールについて](https://www.youtube.com/watch?v=x0NCKZ62eLA)**
+- **[縦断線式集音法によるレール演奏の設計](https://drive.google.com/file/d/1weXp44U6FBnwNdutBvv3uM4hxlOpGpgn/)**
+- **[レールブロックの運動](https://docs.google.com/document/d/17eotTTTSGNSofpDnM20Cwa0V7lLu7w5BK4YLJgbzLEM/)**
+- **[小型ドラムループの周期](https://docs.google.com/document/d/1B-mHSfjt4DzFWQLD5zPTOLHvM4I8Jq1X6B37-szSeqo/)**
+
+# 他リンク
+
+- **[演奏コース研究会](https://sites.google.com/view/loopingmusiclab/%E3%83%9B%E3%83%BC%E3%83%A0)**
+
+
+
+
+
+
+
+
