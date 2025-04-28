@@ -688,7 +688,7 @@ function sortWirings() {
 
     switch (selectLoading.selectedIndex) {
       case 1:
-        yScrollDelay = -(isWater ? 32/3 : 4);
+        yScrollDelay = -(isWater ? 16 : 4);
         break;
 
       case 2:
