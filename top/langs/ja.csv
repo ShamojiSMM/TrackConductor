@@ -11,3 +11,5 @@ button.globalSourceList,グローバル音源集
 text.globalSourceList,Coming Soon...?
 button.linkList,用語・リンク集
 text.linkList,Coming Soon...?
+button.oldVersion,旧ツール
+text.oldVersion,未移植の機能などあります。
