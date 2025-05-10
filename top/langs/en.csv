@@ -11,3 +11,5 @@ button.globalSourceList,Global Source List
 text.globalSourceList,Coming Soon...?
 button.linkList,Term & Link List
 text.linkList,Coming Soon...?
+button.oldVersion,Old Version
+text.oldVersion,Unported Features.
