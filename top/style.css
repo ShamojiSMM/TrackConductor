@@ -1,5 +1,22 @@
 @charset "UTF-8";
 
+#imgCounter {
+  position: absolute;
+  top: 2px;
+  right: 30px;
+  height: 16px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+#imgCounter:hover {
+  transform: scaleX(1.1);
+}
+
+#imgCounter:active {
+  transform: scale(1.1);
+}
+
 .aLinkButton {
   text-decoration: none;
   display: inline-block;
