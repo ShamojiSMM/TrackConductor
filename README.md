@@ -1,5 +1,7 @@
 # 【 [Track Conductor](https://shamojismm.github.io/TrackConductor/top/index.html) 】
 
+(↑からツールへ飛べます。)
+
 *made by [@Shamoji_SMM](https://x.com/Shamoji_SMM)*
 
 `Last Update: 2025/Apr/28`
