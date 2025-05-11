@@ -101,3 +101,6 @@ selectLanguage.value = sessionStorage?.lang || "ja";
 
 selectLanguage.addEventListener("change", changeLanguage);
 changeLanguage();
+
+(new Image()).src = "https://www.f-counter.net/j/65/1746873584/";
+
