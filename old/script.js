@@ -1,3 +1,5 @@
+(new Image()).src = "https://www.f-counter.net/j/65/1746873584/";
+
 var languageIndex = 0;
 
 if (window.navigator.language == "ja") {
