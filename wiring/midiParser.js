@@ -1,3 +1,5 @@
+"use strict";
+
 const MidiParser = {
   parse: function(input) {
     if (input instanceof Uint8Array) return MidiParser.Uint8(input);
@@ -178,11 +180,7 @@ const MidiParser = {
               break;
 
             default:
-              if (this.customInterpreter != null) {
-                event.data = this.customInterpreter(event.meta, file, metaEventLength);
-              }
-
-              if (this.customInterpreter == null || !event.data) {
+              if (!event.data) {
                 file.readInt(metaEventLength);
                 event.data = file.readInt(metaEventLength);
               }
@@ -197,11 +195,7 @@ const MidiParser = {
 
           switch (event.type) {
             case 0xF:
-              if (this.customInterpreter != null) {
-                event.data = this.customInterpreter(event.type, file, false);
-              }
-
-              if (this.customInterpreter == null || !event.data) {
+              if (!event.data) {
                 const eventLength = file.readIntVLV();
                 event.data = file.readRaw(eventLength);
               }
@@ -227,11 +221,7 @@ const MidiParser = {
               break;
 
             default:
-              if (this.customInterpreter != null) {
-                event.data = this.customInterpreter(event.meta, file, false);
-              }
-
-              if (this.customInterpreter == null || !event.data) return false;
+              if (!event.data) return false;
           }
         }
 
@@ -240,7 +230,5 @@ const MidiParser = {
     }
 
     return midi;
-  },
-
-  customInterpreter: null,
+  }
 };
