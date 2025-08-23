@@ -1,6 +1,6 @@
 title,トップ | Track Conductor
 head.top,レール演奏補助ツール
-text.h1Desc,現在大工事中です。
+text.h1Desc,祝！1000人！
 button.wiringGenerator,集音生成
 text.wiringGenerator,"羽なし、水中にも対応しました。"
 button.trackGenerator,レールループ生成
@@ -15,3 +15,4 @@ button.oldVersion,旧ツール
 text.oldVersion,未移植の機能などあります。
 button.readMe,使い方など
 text.readMe,いろいろ。
+
