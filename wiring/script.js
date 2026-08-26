@@ -1,4 +1,9 @@
-"use strict";
+import { dataAssets, landingNamesList } from "./data.js";
+import {
+  GRADE_SYMBOLS, WIRING_ORDERS, accelerationTypeFor, collect, columnHeights,
+  columnTimes, findWirings, gradeSummary, landingColumnDelays, noteFrames,
+  scrollColumnDelays, wiringTiles,
+} from "./engine.js";
 
 function clearRow(tableInd, rowInd, startCellInd = 1) {
   const cells = tables[tableInd].rows[rowInd].cells;
@@ -74,11 +79,10 @@ selectLanguage.addEventListener("change", () => {
 });
 
 const selectLanding = getElm("#selectLanding");
-let typeKeys;
 
 function changeType(isClearRow = true) {
-  typeKeys = selectType.value.split("-");
-  const landings = dataAssets[typeKeys[0]][typeKeys[1]].landings;
+  const [wing, skin] = selectType.value.split("-");
+  const landings = dataAssets[wing][skin].landings;
 
   selectLanding.options.length = 1;
   landings.forEach(landing => addOption(selectLanding, landing.name));
@@ -186,22 +190,12 @@ tables.forEach((table, t) => {
             selectWiringType.selectedIndex = selectType.selectedIndex;
             changeWiringType();
 
-            let accelerationType = "general";
-
-            const landingType = selectLanding.value;
-            if (c == 1) {
-              accelerationType = {
-                "1v": "vertical",
-                "1d": "diagonal",
-                "2a": "second"
-              }[landingType] || accelerationType;
-
-            } else if (
-              typeKeys[0] == "wing" && typeKeys[1] == "ground"
-              && (c == 2 && ["1v", "1d", "4a"].includes(landingType))
-            ) accelerationType = "second";
-
-            selectWiringLanding.value = accelerationType;
+            const landingIndex = selectLanding.selectedIndex;
+            selectWiringLanding.value = accelerationTypeFor(
+              selectType.value,
+              landingIndex == 0 ? null : selectLanding.options[landingIndex].text,
+              c - 1,
+            );
             findWiring();
           });
         }
@@ -338,54 +332,18 @@ inputBeatValue.addEventListener("input", () => {
 
 function calcNote(cellIndex) {
   const cell = tables[0].rows[2].cells[cellIndex];
+  const frames = noteFrames(cell.textContent, {
+    mode: selectNoteInput.selectedIndex == 0 ? "ticks" : "nth",
+    quarterFrames: beatValue,
+    tickUnit,
+  });
 
-  const text = cell.textContent;
-  if (text == "") {
+  if (frames === null) {
     clearCell(0, 3, cellIndex);
     return;
   }
 
-  if (!isNum(beatValue)) {
-    clearCell(0, 3, cellIndex);
-    return;
-  }
-
-  let targetText;
-
-  if (selectNoteInput.selectedIndex == 0) {
-    if (!isNum(text, tickUnit)) {
-      clearCell(0, 3, cellIndex);
-      return;
-    }
-
-    targetText = beatValue * text / tickUnit;
-
-  } else {
-    const parts = text.match(/[\+\-]?\d+\.*/g);
-
-    if (!parts) {
-      clearCell(0, 3, cellIndex);
-      return;
-    }
-
-    let sumNoteValue = 0;
-
-    parts.forEach(part => {
-      let noteValue = beatValue * 4 / part.replace(/[\+\-\.]/g, "");
-      noteValue *= 2 - (2 ** -(part.match(/\./g) || []).length);
-
-      sumNoteValue += (part.startsWith("-") ? -1 : 1) * noteValue;
-    });
-
-    if (!isNum(sumNoteValue)) {
-      clearCell(0, 3, cellIndex);
-      return;
-    }
-
-    targetText = sumNoteValue;
-  }
-
-  tables[0].rows[3].cells[cellIndex].textContent = targetText;
+  tables[0].rows[3].cells[cellIndex].textContent = frames;
 }
 
 function calcAllNotes() {
@@ -469,24 +427,19 @@ getElm("#buttonPlay").addEventListener("click", play);
 getElm("#buttonStopPlay").addEventListener("click", stopPlay);
 
 getElm("#buttonCalcTable0").addEventListener("click", () => {
-  let totalDelay = 0;
-
   const table0Rows = tables[0].rows;
   const table1Rows = tables[1].rows;
-  const baseHeight = table0Rows[4].cells[1].textContent;
 
-  if (!isNum(baseHeight)) return;
+  const read = row => Array.from({ length: tableLength }, (_, i) => table0Rows[row].cells[i + 1].textContent);
+  const write = (row, values) => values.forEach((value, i) => {
+    table1Rows[row].cells[i + 1].textContent = (value === null) ? "" : value;
+  });
 
-  for (let c = 1; c <= tableLength; c ++) {
-    const delay = table0Rows[3].cells[c].textContent;
+  const pitches = read(4);
+  if (!isNum(pitches[0])) return;
 
-    const isDelayNum = isNum(delay);
-    table1Rows[2].cells[c].textContent = isDelayNum ? totalDelay : "";
-    if (isDelayNum) totalDelay += parseFloat(delay);
-
-    const height = table0Rows[4].cells[c].textContent;
-    table1Rows[5].cells[c].textContent = isNum(height) ? height - baseHeight : ""
-  }
+  write(2, columnTimes(read(3)));
+  write(5, columnHeights(pitches));
 });
 
 selectLanding.addEventListener("change", () => {
@@ -494,303 +447,73 @@ selectLanding.addEventListener("change", () => {
 
   if (index == 0) clearRow(1, 3, 2);
   else {
-    const wingType = dataAssets[typeKeys[0]];
-    const landings = wingType[typeKeys[1]].landings;
-    const landing = landings[index - 1];
-
+    const landingName = selectLanding.options[index].text;
+    const delays = landingColumnDelays(selectType.value, landingName, tableLength);
     const cells = tables[1].rows[3].cells;
-    cells[2].textContent = landing.second;
-
-    const offset = parseInt(landing.name[0]);
-    const blockDelays = wingType.blockDelays;
-
-    for (let c = 3; c <= tableLength; c ++) {
-      cells[c].textContent = blockDelays[(offset + c) % 3];
-    }
+    for (let c = 2; c <= tableLength; c ++) cells[c].textContent = delays[c - 1];
   }
 });
+
+function writeScrollDelays(delays) {
+  const cells = tables[1].rows[4].cells;
+  for (let c = 2; c <= tableLength; c ++) {
+    const delay = delays[c - 1];
+    cells[c].textContent = (delay === null) ? "" : delay;
+  }
+}
 
 inputScrollSlownessAve.addEventListener("input", () => {
   if (selectLoading.selectedIndex != 3) return;
-
-  const delay = inputScrollSlownessAve.value;
-  const cells = tables[1].rows[4].cells;
-
-  for (var c = 2; c <= tableLength; c ++) cells[c].textContent = delay;
+  writeScrollDelays(scrollColumnDelays({ average: inputScrollSlownessAve.value }, tableLength));
 });
 
 inputScrollSlownessCycle.addEventListener("input", () => {
-  const text = inputScrollSlownessCycle.value;
-  const delays = text.split(",").map(delay => parseFloat(delay));
-
-  const cells = tables[1].rows[4].cells;
-
-  if (isNum(...delays)) {
-    const length = delays.length;
-    for (let c = 2; c <= tableLength; c ++) cells[c].textContent = delays[(c - 2) % length];
-
-  } else clearRow(1, 4, 2);
+  writeScrollDelays(scrollColumnDelays({ cycle: inputScrollSlownessCycle.value }, tableLength));
 });
-
-function isWirable(delay, height, column) {
-  let near = 0, far = 0;
-
-  delay = Math.round(delay);
-
-  const asset = dataAssets[typeKeys[0]][typeKeys[1]];
-  const {
-    relativeRailDelays, landings, accelerationsList, upOptions, gaps
-  } = asset;
-
-  const isWingWater = typeKeys[0] == "wing" && typeKeys[1] == "water";
-  let accelerations;
-
-  if (!isWingWater) {
-    let accelerationType = "general";
-
-    const landingIndex = selectLanding.selectedIndex;
-    if (landingIndex != 0) {
-      const landingType = landings[landingIndex - 1].name;
-
-      if (column == 0) {
-        accelerationType = {
-          "1v": "vertical",
-          "1d": "diagonal",
-          "2a": "second"
-        }[landingType] || accelerationType;
-
-      } else if (
-        typeKeys[0] == "wing" && typeKeys[1] == "ground"
-        && (column == 1 && ["1v", "1d", "4a"].includes(landingType))
-      ) accelerationType = "second";
-    }
-
-    accelerations = accelerationsList[accelerationType];
-  }
-
-  const accelerationsLen = accelerations?.length;
-  function getAcceleration(distance) {
-    if (isWingWater) return 0;
-
-    return (distance <= accelerationsLen) ? accelerations[distance - 1] : 0;
-  }
-
-  const upOptionsLen = upOptions.length;
-  const gapsLen = gaps.length;
-
-  function addDownOption(_delay, _distance, count) {
-    for (let g = 0; g < gapsLen; g ++) {
-      const gap = gaps[g];
-
-      let dDelay = 0;
-      let d = 1;
-      for (; ; d ++) {
-        const distance = _distance - (gap.down + d * 2);
-        if (distance <= 0) {
-          if (d == 1) return;
-          else break;
-        }
-
-        dDelay += relativeRailDelays[(gap.offset + d - 1) % 3];
-
-        const optionDelay = _delay + gap.delay + dDelay;
-        const totalDelay = optionDelay - getAcceleration(distance);
-
-        const difference = totalDelay - delay;
-        const error = Math.abs(difference);
-
-        if (error <= 2) {
-          switch (error) {
-            case 0: return true;
-
-            case 1:
-              near = 1;
-              break;
-
-            case 2: far = 1;
-          }
-          break;
-
-        } else if ((isWingWater ? -1 : 1) * difference > 0) break;
-
-        if (count > 1) {
-          const isMatch = addDownOption(optionDelay, distance, count - 1);
-          if (isMatch) return true;
-        }
-      }
-    }
-  }
-
-  for (let u = 0; u < upOptionsLen; u ++) {
-    const upOption = upOptions[u];
-
-    if (isWingWater && upOption.delay < delay) continue;
-
-    let dDelay = 0;
-    let d = 0;
-    for (; ; d ++) {
-      const distance = height - d * 2;
-      if (distance <= 0) break;
-
-      if (d != 0) dDelay += relativeRailDelays[(upOption.offset + d - 1) % 3];
-
-      const startingDelay = upOption.delay + dDelay;
-      const totalDelay = startingDelay - getAcceleration(distance);
-
-      const difference = totalDelay - delay;
-      const error = Math.abs(difference);
-
-      if (error <= 2) {
-        switch (error) {
-          case 0: return 0;
-
-          case 1:
-            near = 1;
-            break;
-
-          case 2: far = 1;
-        }
-        break;
-
-      } else if ((isWingWater ? -1 : 1) * difference > 0) break;
-
-      const isMatch = addDownOption(startingDelay, distance, 3);
-      if (isMatch) return 0;
-    }
-
-    if (d == 0) break;
-  }
-
-  if (near == 1) return 1;
-  if (far == 1) return 2;
-  return 3;
-}
 
 const inputBaseDelay = getElm("#inputBaseDelay");
 const inputBaseHeight = getElm("#inputBaseHeight");
 const spanEvals = getElm("#spanEvals");
 
 function sortWirings() {
-  let totalXDelay = 0;
-  const wirings = [];
-
   const table1Rows = tables[1].rows;
+  const read = row => Array.from({ length: tableLength }, (_, i) => table1Rows[row].cells[i + 1].textContent);
 
-  for (let c = 1; c <= tableLength; c ++) {
-    const delay = table1Rows[2].cells[c].textContent;
-    const xDelay = table1Rows[3].cells[c].textContent;
+  const landingIndex = selectLanding.selectedIndex;
+  const { columns, counts } = collect({
+    typeKey: selectType.value,
+    landingName: landingIndex == 0 ? null : selectLanding.options[landingIndex].text,
+    loading: selectLoading.selectedIndex,
+    slownessAve: inputScrollSlownessAve.value,
+    baseDelay: inputBaseDelay.value,
+    baseHeight: inputBaseHeight.value,
+    times: read(2),
+    colDelays: read(3),
+    scrollDelays: read(4),
+    yDifs: read(5),
+  });
 
-    const xScrollDelay = (selectLoading.selectedIndex == 3)
-      ? table1Rows[4].cells[c].textContent : 0;
-    let yScrollDelay = 0;
-
-    const isWater = typeKeys[1] == "water";
-
-    switch (selectLoading.selectedIndex) {
-      case 1:
-        yScrollDelay = -(isWater ? 16 : 4);
-        break;
-
-      case 2:
-        yScrollDelay = parseFloat(inputScrollSlownessAve.value);
-    }
-
-    const height = table1Rows[5].cells[c].textContent;
-
-    const baseDelay = inputBaseDelay.value;
-    const baseHeight = inputBaseHeight.value;
-
-    if (!isNum(delay, xDelay, xScrollDelay, height, baseDelay, baseHeight)) break;
-
-    totalXDelay += (parseFloat(xDelay) + parseFloat(xScrollDelay));
-    wirings.push({
-      index: c,
-      delay:
-        parseFloat(baseDelay) + parseFloat(delay)
-        - parseInt(height) * (yScrollDelay + (isWater ? 16 : 4)),
-      xDelay: totalXDelay,
-      height: parseInt(baseHeight) + parseInt(height)
-    });
-  }
-
-  const wiringsLen = wirings.length;
-  if (!wiringsLen) {
+  if (!columns.length) {
     if (isOverview) changeOverview(false);
     return;
-  }
-
-  let evals = [];
-
-  for (let i = 0; i < wiringsLen; i ++) {
-    const wiring = wirings[i];
-
-    evals[i] ??= isWirable(wiring.delay - wiring.xDelay, wiring.height, i);
-    if (evals[i] == 0) continue;
-
-    const backI = wiringsLen - 1 - i;
-    const shifts = [];
-
-    for (let num = 1; num <= sortableRange; num ++) {
-      if (i >= num) shifts.push(-num);
-      if (backI >= num) shifts.push(num);
-    }
-
-    const movedEvals = [];
-    const evalSums = [];
-
-    shifts.forEach(shift => {
-      if (shift > 0) {
-        const shiftWiring = wirings[i + shift];
-        evals[i + shift] ??= isWirable(
-          shiftWiring.delay - shiftWiring.xDelay, shiftWiring.height, i + shift
-        );
-      }
-
-      const origin = isWirable(
-        wirings[i].delay - wirings[i + shift].xDelay, wirings[i].height, i + shift
-      );
-      const destination = isWirable(
-        wirings[i + shift].delay - wirings[i].xDelay, wirings[i + shift].height, i
-      );
-
-      movedEvals.push({ shift, origin, destination });
-      evalSums.push(origin + destination);
-    });
-
-    const movedEval = movedEvals[evalSums.indexOf(Math.min(...evalSums))];
-    const { shift, origin, destination } = movedEval;
-
-    if (origin + destination < evals[i] + evals[i + shift]) {
-      [wirings[i], wirings[i + shift]] = [wirings[i + shift], wirings[i]];
-      [wirings[i].xDelay, wirings[i + shift].xDelay] = [wirings[i + shift].xDelay, wirings[i].xDelay];
-
-      evals[i] = destination;
-      evals[i + shift] = origin;
-    }
   }
 
   clearRows(2, [2, 3, 4], 1);
   getElm(".wiringDisplay")?.classList.remove("wiringDisplay");
 
   const table2Rows = tables[2].rows;
-  for (let i = 0; i < wiringsLen; i ++) {
+  columns.forEach((column, i) => {
     const th = table2Rows[0].cells[i + 1];
-    const movedInd = wirings[i].index;
-
-    th.textContent = movedInd;
-    if (i + 1 == movedInd) th.classList.remove("movedInd");
+    th.textContent = column.index;
+    if (i + 1 == column.index) th.classList.remove("movedInd");
     else th.classList.add("movedInd");
 
-    table2Rows[2].cells[i + 1].textContent = Math.round(wirings[i].delay - wirings[i].xDelay);
-    table2Rows[3].cells[i + 1].textContent = wirings[i].height;
-    table2Rows[4].cells[i + 1].textContent = ["◎", "○", "△", "×"][evals[i]];
-  }
+    table2Rows[2].cells[i + 1].textContent = column.delay;
+    table2Rows[3].cells[i + 1].textContent = column.height;
+    table2Rows[4].cells[i + 1].textContent = GRADE_SYMBOLS[column.grade];
+  });
 
-  const evalCounts = [0, 0, 0, 0];
-  evals.forEach(e => evalCounts[e] ++);
-  spanEvals.textContent = `
-    ◎: ${evalCounts[0]}, ○: ${evalCounts[1]}, △: ${evalCounts[2]}, ×: ${evalCounts[3]}
-  `;
+  spanEvals.textContent = gradeSummary(counts);
 
   if (isOverview) changeOverview(true);
 }
@@ -928,114 +651,6 @@ const inputWiringDelay = getElm("#inputWiringDelay");
 const inputWiringHeight = getElm("#inputWiringHeight");
 const selectWiringOrder = getElm("#selectWiringOrder");
 
-function findWiringResults(delay, height) {
-  const resultsList = [[], [], []];
-
-  const keys = selectWiringType.value.split("-");
-  const asset = dataAssets[keys[0]][keys[1]];
-  const {
-    relativeRailDelays, accelerationsList, upOptions, gaps
-  } = asset;
-
-  const isWingWater = keys[0] == "wing" && typeKeys[1] == "water";
-  let accelerations;
-
-  if (!isWingWater) accelerations = accelerationsList[selectWiringLanding.value];
-
-  const accelerationsLen = accelerations?.length;
-  function getAcceleration(distance) {
-    if (isWingWater) return 0;
-
-    return (distance <= accelerationsLen) ? accelerations[distance - 1] : 0;
-  }
-
-  const upOptionsLen = upOptions.length;
-  const gapsLen = gaps.length;
-
-  function addDownOption(_delay, _distance, count, _str) {
-    for (let g = 0; g < gapsLen; g ++) {
-      const gap = gaps[g];
-
-      let dDelay = 0;
-      let d = 1;
-      for (; ; d ++) {
-        const distance = _distance - (gap.down + d * 2);
-        if (distance <= 0) {
-          if (d == 1) return;
-          else break;
-        }
-
-        dDelay += relativeRailDelays[(gap.offset + d - 1) % 3];
-
-        const optionDelay = _delay + gap.delay + dDelay;
-        const totalDelay = optionDelay - getAcceleration(distance);
-
-        const str = `${_str}G${gap.down}R${d}`;
-
-        const difference = totalDelay - delay;
-        const error = Math.abs(difference);
-
-        if (error <= 2) {
-          resultsList[error].push({
-            delay: totalDelay,
-            up: startingUp,
-            down: height - distance,
-            str
-          });
-          break;
-
-        } else if ((isWingWater ? -1 : 1) * difference > 0) break;
-
-        if (count > 1) addDownOption(optionDelay, distance, count - 1, str);
-      }
-    }
-  }
-
-  let startingUp;
-
-  for (let u = 0; u < upOptionsLen; u ++) {
-    const upOption = upOptions[u];
-    startingUp = upOption.up;
-
-    if (isWingWater && upOption.delay < delay) continue;
-
-    let dDelay = 0;
-    let d = 0;
-    for (; ; d ++) {
-      const startingDown = d * 2;
-      const distance = height - startingDown;
-      if (distance <= 0) break;
-
-      if (d != 0) dDelay += relativeRailDelays[(upOption.offset + d - 1) % 3];
-
-      const startingDelay = upOption.delay + dDelay;
-      const totalDelay = startingDelay - getAcceleration(distance);
-
-      const str = `${upOption.str}-${(d == 0) ? "" : "R" + d}`;
-
-      const difference = totalDelay - delay;
-      const error = Math.abs(difference);
-
-      if (error <= 2) {
-        resultsList[error].push({
-          delay: totalDelay,
-          up: startingUp,
-          down: startingDown,
-          str
-        });
-        break;
-
-      } else if ((isWingWater ? -1 : 1) * difference > 0) break;
-
-      addDownOption(startingDelay, distance, 3, str);
-    }
-
-    if (d == 0) break;
-  }
-
-  return resultsList;
-}
-
 const canvasWiring = getElm("#canvasWiring");
 
 const partsNames = [
@@ -1043,62 +658,7 @@ const partsNames = [
 ];
 
 function drawWiring(str) {
-  const direction = str[0];
-  const optsList = [];
-  const parts = [];
-
-  str.split("-").forEach(optionsStr => {
-    optsList.push(optionsStr.match(/[RGF]\d*/g) || []);
-  });
-
-  if (direction == "↑") {
-    optsList[0].forEach((option, i) => {
-      switch (option[0]) {
-        case "R":
-          if (i == 0) {
-            if (option[1] == 0) parts.unshift(5);
-            else {
-              parts.unshift(6);
-              [...Array(option[1] - 1)].forEach(() => parts.unshift(6, 7));
-              parts.unshift(((i < optsList[0].length - 1) ? 3 : 5), 7);
-            }
-
-          } else {
-            parts.unshift(4);
-            [...Array(option[1] - 1)].forEach(() => parts.unshift(6, 7));
-            parts.unshift(((i < optsList[0].length - 1) ? 3 : 5), 7);
-          }
-          break;
-
-        case "G":
-          if (i == 0) parts.unshift(3);
-          [...Array(option[1] - 1)].forEach(() => parts.unshift(2));
-          break;
-
-        case "F": if (i == 0) parts.unshift(3);
-      }
-    });
-
-    parts.push(0);
-
-  } else {
-    parts.unshift(3);
-    parts.push(1);
-  }
-
-  if (optsList[1] == "") parts.push(4);
-
-  optsList[1].forEach((option, i) => {
-    if (option[0] == "R") {
-      parts.push((i == 0) ? 6 : 3);
-      [...Array(option[1] - 1)].forEach(() => parts.push(7, 6));
-      parts.push(7, 4);
-
-    } else {
-      if (i == 0) parts.push(4);
-      [...Array(option.slice(1) - 1)].forEach(() => parts.push(2));
-    }
-  });
+  const parts = wiringTiles(str);
 
   const context = canvasWiring.getContext("2d");
 
@@ -1125,16 +685,7 @@ function setWiringResult() {
   if (!resultsList) return;
   const sortIndex = selectWiringOrder.selectedIndex;
 
-  resultsList.forEach(results => {
-    results.sort((a, b) => {
-      return [
-        () => a.up - b.up || a.down - b.down,
-        () => b.up - a.up || a.down - b.down,
-        () => a.down - b.down || a.up - b.up,
-        () => b.down - a.down || a.up - b.up
-      ][sortIndex]();
-    });
-  });
+  resultsList.forEach(results => results.sort(WIRING_ORDERS[sortIndex]));
 
   spanWiringResults.forEach((container, i) => {
     while (container.firstChild) container.removeChild(container.firstChild);
@@ -1173,7 +724,10 @@ function findWiring() {
     return;
   }
 
-  resultsList = findWiringResults(parseInt(delay), parseInt(height));
+  resultsList = findWirings(parseInt(delay), parseInt(height), {
+    typeKey: selectWiringType.value,
+    landingShape: selectWiringLanding.value,
+  });
   setWiringResult();
 }
 

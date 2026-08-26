@@ -1,6 +1,6 @@
 "use strict";
 
-const dataAssets = {
+export const dataAssets = {
   wing: {
     blockDelays: [10, 11, 11],
 
@@ -338,7 +338,7 @@ const dataAssets = {
   }
 };
 
-const landingNamesList = {
+export const landingNamesList = {
   ja: {
     general: "通常",
     second: "2マス目",
